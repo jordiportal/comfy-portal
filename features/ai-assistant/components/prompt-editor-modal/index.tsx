@@ -11,7 +11,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
 import { X } from 'lucide-react-native';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Keyboard } from 'react-native';
+import { Keyboard, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AIMode } from './ai-mode';
 import { TagMode } from './tag-mode';
@@ -57,6 +57,7 @@ export const PromptEditorModal = forwardRef<PromptEditorModalRef, PromptEditorMo
     // Workaround: manually restore position when keyboard hides
     // https://github.com/gorhom/react-native-bottom-sheet/issues/1894
     useEffect(() => {
+      if (Platform.OS === 'web') return;
       const hideSubscription = Keyboard.addListener('keyboardWillHide', () => {
         bottomSheetModalRef.current?.snapToIndex(0);
       });

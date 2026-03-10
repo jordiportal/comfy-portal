@@ -17,7 +17,7 @@ import { showToast } from '@/utils/toast';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { CircleCheck, CircleX, Pencil, X } from 'lucide-react-native';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Keyboard } from 'react-native';
+import { ActivityIndicator, Keyboard, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AIAssistantScreen() {
@@ -36,7 +36,7 @@ export default function AIAssistantScreen() {
 
   const handleOpenPromptSheet = useCallback(() => {
     setDraftPrompt(customPrompt);
-    Keyboard.dismiss();
+    if (Platform.OS !== 'web') Keyboard.dismiss();
     promptSheetRef.current?.present();
   }, [customPrompt]);
 

@@ -15,6 +15,7 @@ import { useIncomingShare } from 'expo-sharing';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import {
@@ -22,6 +23,10 @@ import {
   ReanimatedLogLevel,
 } from 'react-native-reanimated';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+
+const KeyboardWrapper = Platform.OS === 'web'
+  ? ({ children }: { children: React.ReactNode }) => <>{children}</>
+  : KeyboardProvider;
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import * as Sentry from '@sentry/react-native';
@@ -71,7 +76,9 @@ function RootLayoutNav() {
   const preference = useThemeStore((s) => s.preference);
   const colorScheme = useResolvedTheme();
   const router = useRouter();
-  const { resolvedSharedPayloads, clearSharedPayloads, isResolving } = useIncomingShare();
+  const { resolvedSharedPayloads, clearSharedPayloads, isResolving } = Platform.OS === 'web' 
+    ? { resolvedSharedPayloads: [], clearSharedPayloads: () => {}, isResolving: false }
+    : useIncomingShare();
 
   useEffect(() => {
     if (loaded) {
@@ -137,7 +144,7 @@ function RootLayoutNav() {
   return (
     <>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <KeyboardProvider>
+        <KeyboardWrapper>
         <GluestackUIProvider mode={preference}>
           <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
               <BottomSheetModalProvider>
@@ -157,7 +164,7 @@ function RootLayoutNav() {
               <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
           </ThemeProvider>
         </GluestackUIProvider>
-        </KeyboardProvider>
+        </KeyboardWrapper>
       </GestureHandlerRootView>
       <Toast config={toastConfig} topOffset={insets.top + 8} />
     </>

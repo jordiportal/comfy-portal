@@ -26,6 +26,10 @@ export const useBottomSheetTimingConfigs = bottomSheet.useBottomSheetTimingConfi
 export const useBottomSheetSpringConfigs = bottomSheet.useBottomSheetSpringConfigs;
 export const useBottomSheetInternal = bottomSheet.useBottomSheetInternal;
 
+// Scrollable internals needed by bottom-sheet-keyboard-aware-scroll-view
+export const SCROLLABLE_TYPE = bottomSheet.SCROLLABLE_TYPE;
+export const createBottomSheetScrollableComponent = bottomSheet.createBottomSheetScrollableComponent;
+
 // Replace BottomSheetTextInput with standard TextInput on web
 import { TextInput } from 'react-native';
 export const BottomSheetTextInput = TextInput;

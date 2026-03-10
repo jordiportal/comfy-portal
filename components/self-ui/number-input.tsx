@@ -1,9 +1,14 @@
 import { useResolvedTheme } from '@/store/theme';
-import * as Haptics from 'expo-haptics';
 import { Minus, Plus } from 'lucide-react-native';
 import { MotiView } from 'moti';
 import React, { useCallback, useEffect, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
+
+const triggerHaptic = () => {
+  if (Platform.OS !== 'web') {
+    require('expo-haptics').selectionAsync();
+  }
+};
 import { Icon } from '../ui/icon';
 import { Input, InputField } from '../ui/input';
 
@@ -67,7 +72,7 @@ export function NumberInput({
   }, [value, decimalPlaces]);
 
   const handleHapticFeedback = useCallback(() => {
-    Haptics.selectionAsync();
+    triggerHaptic();
   }, []);
 
   const adjustValue = useCallback(

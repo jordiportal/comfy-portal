@@ -10,7 +10,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { RefreshCw } from 'lucide-react-native';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { Keyboard, ListRenderItem, View } from 'react-native';
+import { Keyboard, ListRenderItem, Platform, View } from 'react-native';
 import { SearchableBottomSheetProps, SelectorOption } from '../types';
 import { Item } from './item';
 import { SearchHeader } from './search-header';
@@ -46,6 +46,7 @@ export const SearchableBottomSheet = forwardRef<BottomSheetModal, SearchableBott
     // Workaround: manually restore position when keyboard hides
     // https://github.com/gorhom/react-native-bottom-sheet/issues/1894
     useEffect(() => {
+      if (Platform.OS === 'web') return;
       const hideSubscription = Keyboard.addListener('keyboardWillHide', () => {
         bottomSheetRef.current?.snapToIndex(0);
       });

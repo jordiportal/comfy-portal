@@ -2,7 +2,7 @@ import { Colors } from '@/constants/Colors';
 import { useResolvedTheme } from '@/store/theme';
 import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TextInputProps, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TextInput, TextInputProps, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 
 interface BottomSheetFormInputProps extends TextInputProps {
   title?: string;
@@ -12,6 +12,22 @@ interface BottomSheetFormInputProps extends TextInputProps {
   inputStyle?: TextStyle;
   titleStyle?: TextStyle;
   errorStyle?: TextStyle;
+}
+
+function TitleLabel({ text, color, style }: { text: string; color: string; style?: TextStyle }) {
+  return <Text style={[styles.title, { color }, style]}>{text}</Text>;
+}
+
+function ErrorLabel({ text, color, style }: { text: string; color: string; style?: TextStyle }) {
+  return <Text style={[styles.error, { color }, style]}>{text}</Text>;
+}
+
+function PasswordToggle({ visible, onToggle, color }: { visible: boolean; onToggle: () => void; color: string }) {
+  return (
+    <TouchableOpacity style={styles.eyeIcon} onPress={onToggle} activeOpacity={0.7}>
+      {visible ? <EyeOff size={18} color={color} /> : <Eye size={18} color={color} />}
+    </TouchableOpacity>
+  );
 }
 
 /**
@@ -28,6 +44,8 @@ export const BottomSheetFormInput: React.FC<BottomSheetFormInputProps> = ({
   errorStyle,
   placeholder,
   secureTextEntry,
+  defaultValue,
+  value,
   ...restProps
 }) => {
   const theme = useResolvedTheme();
@@ -43,73 +61,46 @@ export const BottomSheetFormInput: React.FC<BottomSheetFormInputProps> = ({
 
   const isPasswordInput = secureTextEntry === true;
 
+  const safeValue = value != null ? String(value) : undefined;
+  const safeDefaultValue = defaultValue != null ? String(defaultValue) : undefined;
+
   return (
-    <View style={[styles.container, containerStyle]}>
-      {title && (
-        <Text style={[
-          styles.title,
-          { color: titleTextColor },
-          titleStyle
-        ]}>
-          {title}
-        </Text>
-      )}{/* no whitespace between View children */}
-      <View style={[
-        styles.inputContainer,
-        { backgroundColor: inputBackgroundColor },
-        inputContainerStyle
-      ]}>
+    <div style={Object.assign({}, flatStyles.container, containerStyle)}>
+      {title ? <TitleLabel text={title} color={titleTextColor} style={titleStyle} /> : null}
+      <div style={Object.assign({}, flatStyles.inputContainer, { backgroundColor: inputBackgroundColor }, inputContainerStyle)}>
         <TextInput
-          style={[
-            styles.input,
-            { color: inputTextColor },
-            isPasswordInput && { paddingRight: 40 },
-            inputStyle
-          ]}
+          style={[styles.input, { color: inputTextColor }, isPasswordInput && { paddingRight: 40 }, inputStyle]}
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           secureTextEntry={isPasswordInput && !showPassword}
+          value={safeValue}
+          defaultValue={safeDefaultValue}
           {...restProps}
-        />{isPasswordInput && (
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}
-            activeOpacity={0.7}
-          >
-            {showPassword ? (
-              <EyeOff size={18} color={iconColor} />
-            ) : (
-              <Eye size={18} color={iconColor} />
-            )}
-          </TouchableOpacity>
-        )}
-      </View>{error && (
-        <Text style={[
-          styles.error,
-          { color: errorTextColor },
-          errorStyle
-        ]}>
-          {error}
-        </Text>
-      )}
-    </View>
+        />
+        {isPasswordInput ? <PasswordToggle visible={showPassword} onToggle={() => setShowPassword(!showPassword)} color={iconColor} /> : null}
+      </div>
+      {error ? <ErrorLabel text={error} color={errorTextColor} style={errorStyle} /> : null}
+    </div>
   );
 };
 
-const styles = StyleSheet.create({
+const flatStyles: Record<string, React.CSSProperties> = {
   container: {
     marginBottom: 10,
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 4,
   },
   inputContainer: {
     borderWidth: 0,
     borderRadius: 8,
     overflow: 'hidden',
-    position: 'relative',
+    position: 'relative' as const,
+  },
+};
+
+const styles = StyleSheet.create({
+  title: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
   },
   input: {
     height: 36,
@@ -126,5 +117,5 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 });

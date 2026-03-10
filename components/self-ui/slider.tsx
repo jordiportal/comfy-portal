@@ -1,10 +1,15 @@
 import { Colors } from '@/constants/Colors';
 import { useResolvedTheme } from '@/store/theme';
 import RNSlider from '@react-native-community/slider';
-import * as Haptics from 'expo-haptics';
 import { Minus, Plus } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity } from 'react-native';
+
+const triggerHaptic = () => {
+  if (Platform.OS !== 'web') {
+    require('expo-haptics').selectionAsync();
+  }
+};
 import { Icon } from '../ui/icon';
 import { Text } from '../ui/text';
 
@@ -111,7 +116,7 @@ export function NumberSlider({
       if (onChange) {
         onChange(newValue);
       }
-      Haptics.selectionAsync();
+      triggerHaptic();
     },
     [localValue, minValue, maxValue, precision, onChange],
   );
@@ -131,7 +136,7 @@ export function NumberSlider({
       if (onChangeEnd) {
         onChangeEnd(newValue);
       }
-      Haptics.selectionAsync();
+      triggerHaptic();
     },
     [onChangeEnd],
   );

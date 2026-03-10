@@ -48,6 +48,8 @@ export const useServersStore = create<ServersState>()(
         set((state) => ({
           servers: [...state.servers, newServer],
         }));
+        // Auto-check server status after adding
+        get().refreshServer(newServer.id);
       },
 
       removeServer: (id) =>
